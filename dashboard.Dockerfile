@@ -11,9 +11,9 @@ USER node
 
 # Bust cache (this will allow it to pull the latest version of the dashboard from the repo)
 ARG CACHEBUST=1
-ARG GIT_URL=https://github.com/TicketsBot-cloud/dashboard
+ARG GIT_URL=https://github.com/Chaoskjell44/dashboard
 ARG GIT_BRANCH=master
-ARG COMMIT_HASH=27b2c0e8c63dc66ed9c715823dcfd2b57c1a4beb
+ARG COMMIT_HASH=532427b74b93fbb56b86c86dec036666f8eaba09
 
 # Clone the repository to /tmp
 RUN git clone -b $GIT_BRANCH $GIT_URL.git /tmp
@@ -32,6 +32,7 @@ ARG CLIENT_ID
 ARG REDIRECT_URI
 ARG API_URL
 ARG WS_URL
+ARG INVITE_URL
 
 RUN npm run build
 

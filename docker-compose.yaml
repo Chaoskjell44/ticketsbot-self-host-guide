@@ -259,13 +259,13 @@ services:
   sharder-main:
     image: ${SHADER_IMAGE:-ghcr.io/ticketsbot/main-sharder:a4bf4a98848094435d017d90c2cfc09a04146ef3}
     container_name: sharder-main
-    hostname: sharder-0
+    hostname: sharder-1
     ports:
       - "8092:8091"
     environment:
       RUST_LOG: trace
       # sharder_id: 0 # this is automatically set by the dash from the hostname
-      sharder_total: 1
+      sharder_total: 2
 
       redis_addr: ${REDIS_ADDR:-redis:6379}
       redis_password: ${REDIS_PASSWORD:-null}
@@ -354,6 +354,8 @@ services:
       S3_IMPORT_SECRET_KEY: ${S3_SECRET}
       S3_IMPORT_TRANSCRIPT_BUCKET: ${S3_TRANSCRIPT_IMPORT_BUCKET}
       S3_IMPORT_DATA_BUCKET: ${S3_DATA_IMPORT_BUCKET}
+      POWEREDBY: ${POWERED_BY:-github.com/ticketsbot}
+      ICON_URL: ${ICON_URL:-https://ticketsbot.net/assets/icon.png}
     depends_on:
       postgres:
         condition: service_healthy
@@ -507,6 +509,39 @@ services:
     networks:
       - app-network
 
+        sharder-whitelabel:
+    image: ${SHADER_IMAGE:-ghcr.io/ticketsbot/whitelabel-sharder:a4bf4a98848094435d017d90c2cfc09a04146ef3}
+    container_name: sharder-whitelabel
+    hostname: sharder-0
+    ports:
+      - "8093:8092"
+    environment:
+      RUST_LOG: trace
+      # sharder_id: 0 # this is automatically set by the dash from the hostname
+      sharder_total: 1
+
+      redis_addr: ${REDIS_ADDR:-redis:6379}
+      redis_password: ${REDIS_PASSWORD:-null}
+      redis_threads: 2
+
+      metrics_addr: 0.0.0.0:8091
+      sentry_dsn: ${SENTRY_DSN}
+      worker_svc_uri: worker-gateway:4001
+
+      kafka_brokers: kafka:9092
+      kafka_topic: ticketsbot
+
+      DATABASE_URI: postgres://postgres:${DATABASE_PASSWORD:-null}@${DATABASE_HOST:-postgres:5432}/ticketsbot
+      DATABASE_THREADS: 4
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgres-cache:
+        condition: service_healthy
+    networks:
+      - app-network
+	  
 networks:
   app-network:
     driver: bridge
